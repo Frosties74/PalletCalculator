@@ -1,1 +1,23 @@
-
+[
+    {
+        "tab": "Config.generalTab",
+        "key": "pallet.propertyId",
+        "label": "Config.palletPropertyId",
+        "type": "text",
+        "default": ""
+    },
+    {
+        "tab": "Config.generalTab",
+        "key": "pallet.orderPropertyTypeId",
+        "label": "Config.orderPropertyTypeId",
+        "type": "text",
+        "default": ""
+    },
+    {
+        "tab": "Config.generalTab",
+        "key": "pallet.quantityPerPallet",
+        "label": "Config.quantityPerPallet",
+        "type": "text",
+        "default": "45"
+    }
+]

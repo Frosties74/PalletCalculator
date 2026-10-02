@@ -1,1 +1,17 @@
-
+{
+    "name": "PalletCalculator",
+    "description": "Berechnet den Palettenbedarf eines PlentyONE-Auftrags anhand palettenrelevanter Varianten und Bundle-Komponenten.",
+    "namespace": "PalletCalculator",
+    "author": "Hamann",
+    "type": "general",
+    "serviceProvider": "PalletCalculator\\Providers\\PalletCalculatorServiceProvider",
+    "version": "1.0.0",
+    "license": "MIT",
+    "keywords": [
+        "plentyone",
+        "palette",
+        "palettenberechnung",
+        "bundle",
+        "flow"
+    ]
+}

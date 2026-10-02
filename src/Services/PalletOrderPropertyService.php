@@ -25,11 +25,9 @@ class PalletOrderPropertyService
             ConfigRepository::class
         );
 
-
         $typeId = (int)$config->get(
             'PalletCalculator.pallet.orderPropertyTypeId'
         );
-
 
         if ($typeId <= 0) {
             throw new \RuntimeException(
@@ -37,12 +35,10 @@ class PalletOrderPropertyService
             );
         }
 
-
         /** @var OrderPropertyRepositoryContract $repository */
         $repository = pluginApp(
             OrderPropertyRepositoryContract::class
         );
-
 
         /*
          * Prüfen, ob für den Auftrag bereits
@@ -53,21 +49,23 @@ class PalletOrderPropertyService
             $typeId
         );
 
-
         $existingProperty = null;
 
-
-        if (is_iterable($existingProperties)) {
+        /*
+         * Plenty liefert hier eine Collection.
+         *
+         * Kein is_iterable() verwenden, da diese
+         * PHP-Funktion in PlentyONE Plugins nicht
+         * erlaubt ist.
+         */
+        if ($existingProperties) {
             foreach ($existingProperties as $property) {
                 if ((int)$property->typeId === $typeId) {
                     $existingProperty = $property;
                     break;
                 }
             }
-        } elseif ($existingProperties) {
-            $existingProperty = $existingProperties;
         }
-
 
         /*
          * Vorhandenen Wert aktualisieren.
@@ -88,7 +86,6 @@ class PalletOrderPropertyService
 
             return;
         }
-
 
         /*
          * Noch keine Palettenanzahl vorhanden:

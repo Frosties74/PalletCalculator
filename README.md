@@ -1,2 +1,2 @@
-# Plenty_Plugin_Paletten
+# PalletCalculator
 Palettenberechnung im Flow

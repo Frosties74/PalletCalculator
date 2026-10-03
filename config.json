@@ -19,5 +19,12 @@
         "label": "Config.quantityPerPallet",
         "type": "text",
         "default": "45"
+    },
+    {
+        "tab": "Config.generalTab",
+        "key": "pallet.maxWeight",
+        "label": "Config.maxPalletWeight",
+        "type": "text",
+        "default": ""
     }
 ]

@@ -46,6 +46,11 @@ class PalletCalculatorService
             45
         );
 
+        $maxPalletWeight = (float)$config->get(
+            'PalletCalculator.pallet.maxWeight',
+            0
+        );
+
 
         if ($propertyId <= 0) {
             throw new \RuntimeException(
@@ -226,6 +231,9 @@ class PalletCalculatorService
 
             'quantityPerPallet' =>
                 $quantityPerPallet,
+
+            'maxPalletWeight' =>
+                $maxPalletWeight,
 
             'palletCount' =>
                 $palletCount,

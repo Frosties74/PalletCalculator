@@ -151,6 +151,12 @@ Standard:
 
 45
 
+4. Maximalgewicht der Palette (kg)
+
+Die Einstellung wird bereits aus der Plugin-Konfiguration
+ausgelesen, aber noch nicht bei der Palettenberechnung
+berücksichtigt.
+
 
 ## PlentyFlow
 

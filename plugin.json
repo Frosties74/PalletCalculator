@@ -5,7 +5,7 @@
     "author": "Hamann",
     "type": "general",
     "serviceProvider": "PalletCalculator\\Providers\\PalletCalculatorServiceProvider",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "license": "MIT",
     "keywords": [
         "plentyone",

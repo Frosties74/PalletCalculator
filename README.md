@@ -153,9 +153,9 @@ Standard:
 
 4. Maximalgewicht der Palette (kg)
 
-Die Einstellung wird bereits aus der Plugin-Konfiguration
-ausgelesen, aber noch nicht bei der Palettenberechnung
-berücksichtigt.
+Für jede palettenrelevante Variante muss in PlentyONE ein
+Bruttogewicht hinterlegt sein. Nicht palettenrelevante Positionen
+werden auch bei der Gewichtsberechnung ignoriert.
 
 
 ## PlentyFlow
@@ -179,9 +179,9 @@ Diese Aktion:
 
 6. prüft die Eigenschaft "Palettenrelevant"
 
-7. addiert ausschließlich relevante Mengen
+7. addiert ausschließlich relevante Mengen und Gewichte
 
-8. berechnet die Palettenanzahl
+8. berechnet die Palettenanzahl nach Stückzahl und Gewicht
 
 9. speichert das Ergebnis am Auftrag
 
@@ -205,13 +205,22 @@ weitere Versandlogik
 
 ## Formel
 
-Palettenanzahl = ceil(
-    Palettenrelevante Menge
+Paletten nach Stückzahl = ceil(
+    Palettenrelevante Menge / Stück pro Palette
+)
+
+Paletten nach Gewicht = ceil(
+    Gesamtgewicht palettenrelevanter Positionen
     /
-    Stück pro Palette
+    Maximalgewicht der Palette
+)
+
+Palettenanzahl = max(
+    Paletten nach Stückzahl,
+    Paletten nach Gewicht
 )
 
 
 ## Version
 
-1.0.0
+1.1.1

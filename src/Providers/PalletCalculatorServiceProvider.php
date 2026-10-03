@@ -18,13 +18,14 @@ class PalletCalculatorServiceProvider extends ServiceProvider
 
     /**
      * Register the PlentyFlow action.
-     *
-     * @param PluginFlowRegistrationService $flowRegistrationService
      */
-    public function boot(
-        PluginFlowRegistrationService $flowRegistrationService
-    )
+    public function boot()
     {
+        /** @var PluginFlowRegistrationService $flowRegistrationService */
+        $flowRegistrationService = pluginApp(
+            PluginFlowRegistrationService::class
+        );
+
         $flowRegistrationService->registerAction(
             pluginApp(CalculatePalletsAction::class)
         );

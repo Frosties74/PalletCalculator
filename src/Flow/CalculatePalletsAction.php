@@ -183,11 +183,14 @@ class CalculatePalletsAction extends PluginFlowStepActionDefinition
                     $extraParams['flowName'] ?? '',
                     $extraParams['workflowName'] ?? null,
                     sprintf(
-                        'Palettenberechnung abgeschlossen: %.2f palettenrelevante Stück, davon %.2f normale Varianten und %.2f Bundle-Komponenten = %d Palette(n).',
+                        'Palettenberechnung abgeschlossen: %.2f palettenrelevante Stück mit %.2f kg, davon %.2f normale Varianten und %.2f Bundle-Komponenten = %d Palette(n) (Stückzahl: %d, Gewicht: %d).',
                         $result['relevantQuantity'],
+                        $result['relevantWeightKg'],
                         $result['normalVariationQuantity'],
                         $result['bundleComponentQuantity'],
-                        $result['palletCount']
+                        $result['palletCount'],
+                        $result['palletCountByQuantity'],
+                        $result['palletCountByWeight']
                     ),
                     [
                         'orderId' =>
@@ -195,6 +198,9 @@ class CalculatePalletsAction extends PluginFlowStepActionDefinition
 
                         'relevantQuantity' =>
                             $result['relevantQuantity'],
+
+                        'relevantWeightKg' =>
+                            $result['relevantWeightKg'],
 
                         'normalVariationQuantity' =>
                             $result['normalVariationQuantity'],
@@ -204,6 +210,15 @@ class CalculatePalletsAction extends PluginFlowStepActionDefinition
 
                         'quantityPerPallet' =>
                             $result['quantityPerPallet'],
+
+                        'maxPalletWeight' =>
+                            $result['maxPalletWeight'],
+
+                        'palletCountByQuantity' =>
+                            $result['palletCountByQuantity'],
+
+                        'palletCountByWeight' =>
+                            $result['palletCountByWeight'],
 
                         'palletCount' =>
                             $result['palletCount'],

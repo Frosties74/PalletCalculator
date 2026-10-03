@@ -3,6 +3,7 @@
 namespace PalletCalculator\Services;
 
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Item\Variation\Contracts\VariationRepositoryContract;
 use Plenty\Plugin\ConfigRepository;
 
 class PalletCalculatorService
@@ -25,6 +26,7 @@ class PalletCalculatorService
      * - Bundle-Komponenten werden geprüft und gezählt
      * - andere Positionstypen werden ignoriert
      * - nur Varianten mit "Palettenrelevant" fließen ein
+     * - Stückzahl- und Gewichtsgrenze werden parallel berücksichtigt
      *
      * @param int $orderId
      *
@@ -66,6 +68,13 @@ class PalletCalculatorService
         }
 
 
+        if ($maxPalletWeight <= 0) {
+            throw new \RuntimeException(
+                '"Maximalgewicht der Palette" muss größer als 0 sein.'
+            );
+        }
+
+
         /** @var OrderRepositoryContract $orderRepository */
         $orderRepository = pluginApp(
             OrderRepositoryContract::class
@@ -90,12 +99,20 @@ class PalletCalculatorService
         );
 
 
+        /** @var VariationRepositoryContract $variationRepository */
+        $variationRepository = pluginApp(
+            VariationRepositoryContract::class
+        );
+
+
         $relevantQuantity = 0.0;
+        $relevantWeightG = 0.0;
 
         $normalVariationQuantity = 0.0;
         $bundleComponentQuantity = 0.0;
 
         $relevantPositions = [];
+        $variationWeights = [];
 
 
         foreach ($order->orderItems as $orderItem) {
@@ -173,9 +190,38 @@ class PalletCalculatorService
 
 
             /*
+             * Das Bruttogewicht der Variante wird von PlentyONE
+             * in Gramm bereitgestellt. Mehrfach vorkommende Varianten
+             * werden innerhalb einer Berechnung nur einmal geladen.
+             */
+            if (!array_key_exists($variationId, $variationWeights)) {
+                $variation = $variationRepository->findById(
+                    $variationId
+                );
+
+                $variationWeights[$variationId] =
+                    $variation ? (float)$variation->weightG : 0.0;
+            }
+
+            $unitWeightG = $variationWeights[$variationId];
+
+
+            if ($unitWeightG <= 0) {
+                throw new \RuntimeException(
+                    'Für die palettenrelevante Variante ' .
+                    $variationId .
+                    ' ist kein gültiges Bruttogewicht hinterlegt.'
+                );
+            }
+
+            $positionWeightG = $unitWeightG * $quantity;
+
+
+            /*
              * Menge auf die Gesamtmenge addieren.
              */
             $relevantQuantity += $quantity;
+            $relevantWeightG += $positionWeightG;
 
 
             /*
@@ -192,7 +238,9 @@ class PalletCalculatorService
                 'orderItemId' => (int)$orderItem->id,
                 'variationId' => $variationId,
                 'typeId' => $typeId,
-                'quantity' => $quantity
+                'quantity' => $quantity,
+                'unitWeightG' => $unitWeightG,
+                'positionWeightG' => $positionWeightG
             ];
         }
 
@@ -204,24 +252,37 @@ class PalletCalculatorService
          *
          * Beispiel:
          *
-         * 45 / 45 = 1
-         * 46 / 45 = 1,022 -> ceil() = 2
-         * 90 / 45 = 2
+         * Das höhere Ergebnis aus Stückzahl- und Gewichtsgrenze
+         * bestimmt die benötigte Palettenanzahl.
          */
-        $palletCount = 0;
+        $palletCountByQuantity = 0;
+        $palletCountByWeight = 0;
 
 
         if ($relevantQuantity > 0) {
-            $palletCount = (int)ceil(
+            $palletCountByQuantity = (int)ceil(
                 $relevantQuantity / $quantityPerPallet
             );
+
+            $palletCountByWeight = (int)ceil(
+                $relevantWeightG / ($maxPalletWeight * 1000)
+            );
         }
+
+
+        $palletCount = max(
+            $palletCountByQuantity,
+            $palletCountByWeight
+        );
 
 
         return [
             'orderId' => $orderId,
 
             'relevantQuantity' => $relevantQuantity,
+
+            'relevantWeightKg' =>
+                $relevantWeightG / 1000,
 
             'normalVariationQuantity' =>
                 $normalVariationQuantity,
@@ -234,6 +295,12 @@ class PalletCalculatorService
 
             'maxPalletWeight' =>
                 $maxPalletWeight,
+
+            'palletCountByQuantity' =>
+                $palletCountByQuantity,
+
+            'palletCountByWeight' =>
+                $palletCountByWeight,
 
             'palletCount' =>
                 $palletCount,
